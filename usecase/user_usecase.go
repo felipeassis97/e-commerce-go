@@ -3,6 +3,7 @@ package usecase
 import (
 	"go-api/model"
 	"go-api/repository"
+	"go-api/security"
 )
 
 type UserUseCase struct {
@@ -20,5 +21,10 @@ func (u *UserUseCase) GetUserByID(ID int) (*model.User, error) {
 }
 
 func (u *UserUseCase) CreateUser(user model.User) (*model.User, error) {
+	hash, err := security.Hash(user.Password)
+	if err != nil {
+		return nil, err
+	}
+	user.Password = string(hash)
 	return u.repository.CreateUser(user)
 }

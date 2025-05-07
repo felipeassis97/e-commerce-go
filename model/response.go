@@ -13,4 +13,5 @@ const (
 	InternalError Type = "InternalError"
 	EmptyResponse Type = "EmptyResponse"
 	InvalidBody   Type = "InvalidBody"
+	Unauthorized  Type = "Unauthorized"
 )

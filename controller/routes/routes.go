@@ -11,8 +11,15 @@ import (
 
 // RegisterRoutes register all application routes
 func RegisterRoutes(server *gin.Engine, conn *sql.DB) {
+	registerLoginRoutes(server, buildLoginController(conn))
 	registerUserRoutes(server, buildUserController(conn))
 	registerProductRoutes(server, buildProductController(conn))
+}
+
+func buildLoginController(conn *sql.DB) controllers.LoginController {
+	repo := repository.NewUserRepository(conn)
+	useCase := usecase.NewLoginUseCase(repo)
+	return controllers.NewLoginController(useCase)
 }
 
 func buildProductController(conn *sql.DB) controllers.ProductController {
