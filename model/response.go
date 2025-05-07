@@ -10,6 +10,7 @@ type Type string
 
 const (
 	MissingParams Type = "MissingParams"
-	DatabaseError Type = "DatabaseError"
+	InternalError Type = "InternalError"
 	EmptyResponse Type = "EmptyResponse"
+	InvalidBody   Type = "InvalidBody"
 )

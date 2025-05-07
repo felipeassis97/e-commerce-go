@@ -16,12 +16,12 @@ func NewProductUsecase(repository repository.ProductRepository) ProductUseCase {
 	}
 }
 
-// GetProducts returns a list of products from the Repository
+// GetProducts returns a list of product from the Repository
 func (pu *ProductUseCase) GetProducts() ([]model.Product, error) {
 	return pu.repository.GetProducts()
 }
 
-func (pu *ProductUseCase) CreateProduct(product model.Product) (int64, error) {
+func (pu *ProductUseCase) CreateProduct(product model.Product) (*model.Product, error) {
 	return pu.repository.CreateProduct(product)
 }
 

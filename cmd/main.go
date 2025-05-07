@@ -1,10 +1,9 @@
 package main
 
 import (
-	"go-api/controller"
+	"go-api/controller/routes"
 	"go-api/db"
-	"go-api/repository"
-	"go-api/usecase"
+	"log"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,23 +15,21 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	defer conn.Close()
+	defer func() {
+		if err := conn.Close(); err != nil {
+			log.Printf("error closing connection: %v", err)
+		}
+	}()
 
-	ProductRepository := repository.NewProductRepository(conn)
-	ProductUseCase := usecase.NewProductUsecase(ProductRepository)
-	productController := controller.NewProductController(ProductUseCase)
+	routes.RegisterRoutes(server, conn)
 
 	server.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
-			"message": "pong",
+			"message": "pong Edited num 2",
 		})
 	})
-
-	server.GET("/products", productController.GetProducts)
-
-	server.POST("/product", productController.CreateProduct)
-
-	server.GET("/product/:productID", productController.GetProductByID)
-
-	server.Run(":8000")
+	err = server.Run(":8000")
+	if err != nil {
+		panic(err)
+	}
 }

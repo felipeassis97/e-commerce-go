@@ -1,4 +1,4 @@
-package controller
+package controllers
 
 import (
 	"fmt"
@@ -10,50 +10,54 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type productController struct {
+type ProductController struct {
 	productUseCase usecase.ProductUseCase
 }
 
-func NewProductController(usecase usecase.ProductUseCase) productController {
-	return productController{
+func NewProductController(usecase usecase.ProductUseCase) ProductController {
+	return ProductController{
 		productUseCase: usecase,
 	}
 }
 
-func (p *productController) GetProducts(ctx *gin.Context) {
+func (p *ProductController) GetProducts(ctx *gin.Context) {
 	products, err := p.productUseCase.GetProducts()
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Error getting products",
+			"message": "Error getting product",
 		})
 		return
 	}
 	ctx.JSON(http.StatusOK, products)
 }
 
-func (p *productController) CreateProduct(ctx *gin.Context) {
+func (p *ProductController) CreateProduct(ctx *gin.Context) {
 	var product model.Product
 	err := ctx.ShouldBindJSON(&product)
 	if err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{
-			"message": "Error parsing request body",
-		})
+		response := model.Response{
+			Type:    model.InvalidBody,
+			Message: "Error parsing request body",
+		}
+		ctx.JSON(http.StatusBadRequest, response)
 		return
 	}
-	ID, err := p.productUseCase.CreateProduct(product)
+	createdProduct, err := p.productUseCase.CreateProduct(product)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": "Error creating product",
-		})
+		response := model.Response{
+			Type:    model.InternalError,
+			Message: "Error while creating product",
+		}
+		ctx.JSON(http.StatusInternalServerError, response)
 		return
 	}
 	ctx.JSON(http.StatusCreated, gin.H{
-		"id":      ID,
-		"message": "Created product",
+		"message": "Product created",
+		"product": createdProduct,
 	})
 }
 
-func (p *productController) GetProductByID(ctx *gin.Context) {
+func (p *ProductController) GetProductByID(ctx *gin.Context) {
 	id := ctx.Param("productID")
 	if id == "" {
 		response := model.Response{
@@ -77,7 +81,7 @@ func (p *productController) GetProductByID(ctx *gin.Context) {
 	product, err := p.productUseCase.GetProductByID(int64(productID))
 	if err != nil {
 		response := model.Response{
-			Type:    model.DatabaseError,
+			Type:    model.InternalError,
 			Message: fmt.Sprintf("Error getting product ID: %s", id),
 		}
 		ctx.JSON(http.StatusInternalServerError, response)
@@ -87,7 +91,7 @@ func (p *productController) GetProductByID(ctx *gin.Context) {
 	if product == nil {
 		response := model.Response{
 			Type:    model.EmptyResponse,
-			Message: fmt.Sprintf("Product ID: %s not found", id),
+			Message: fmt.Sprintf("Name ID: %s not found", id),
 		}
 		ctx.JSON(http.StatusNotFound, response)
 		return
