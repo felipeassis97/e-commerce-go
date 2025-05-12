@@ -30,7 +30,7 @@ func (u *LoginController) Login(ctx *gin.Context) {
 		return
 	}
 
-	login, err := u.usecase.Login(user)
+	login, token, err := u.usecase.Login(user)
 	if err != nil {
 		response := model.Response{
 			Type:    model.Unauthorized,
@@ -39,6 +39,8 @@ func (u *LoginController) Login(ctx *gin.Context) {
 		ctx.JSON(http.StatusUnauthorized, response)
 		return
 	}
+
+	ctx.Header("Authorization", "Bearer "+string(token))
 
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": "User found",

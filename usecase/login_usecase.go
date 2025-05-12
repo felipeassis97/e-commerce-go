@@ -16,18 +16,22 @@ func NewLoginUseCase(repository repository.UserRepository) LoginUseCase {
 	}
 }
 
-func (u *LoginUseCase) Login(credentials model.User) (*model.User, error) {
+func (u *LoginUseCase) Login(credentials model.User) (*model.User, string, error) {
 	user, err := u.repository.FindByName(credentials.Name)
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	err = security.VerifyPassword(user.Password, credentials.Password)
-
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return user, nil
+	token, err := security.GenerateToken(user)
+	if err != nil {
+		return nil, "", err
+	}
+
+	return user, token, nil
 }

@@ -4,7 +4,7 @@ services:
     image: go-api
     restart: always
     env_file:
-      - config/docker/db/db.env
+      - config/.env
     build: .
     ports:
       - "8000:8000"
@@ -16,7 +16,7 @@ services:
     image: go-db
     restart: always
     env_file:
-      - config/docker/db/db.env
+      - config/.env
     ports:
       - "5432:5432"
     volumes:

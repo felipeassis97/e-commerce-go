@@ -4,6 +4,7 @@ import "golang.org/x/crypto/bcrypt"
 
 // Hash transforms string to hash
 func Hash(password string) ([]byte, error) {
+
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
 
